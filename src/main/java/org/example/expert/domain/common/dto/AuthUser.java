@@ -1,7 +1,12 @@
 package org.example.expert.domain.common.dto;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import org.example.expert.domain.user.enums.UserRole;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Getter
 public class AuthUser {
@@ -16,5 +21,9 @@ public class AuthUser {
         this.email = email;
         this.userRole = userRole;
         this.nickname = nickname;
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(userRole.getUserRole()));
     }
 }
