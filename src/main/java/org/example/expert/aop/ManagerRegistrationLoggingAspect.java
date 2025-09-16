@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 public class ManagerRegistrationLoggingAspect {
 
     private final LogService logService;
-    private final HttpServletRequest request;
 
     @Around("execution(* org.example.expert.domain.manager.controller.ManagerController.saveManager(..))")
     public Object logManagerRegistration(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -30,22 +29,14 @@ public class ManagerRegistrationLoggingAspect {
         Long todoId = null;
         Long managerUserId = null;
 
-        // SecurityContext에서 현재 사용자 ID 가져오기
-        for (Object arg : args) {
-            if (arg instanceof AuthUser authUser) {
-                requestUserId = authUser.getId();
-                break;
-            }
-        }
+        if (args.length > 2
+                && args[0] instanceof AuthUser authUser
+                && args[1] instanceof Long todoIdParam
+                && args[2] instanceof ManagerSaveRequest managerSaveRequest) {
 
-        if (args.length > 2) {
-            Object secondParam = args[1];
-            Object thirdParam = args[2];
-
-            if (thirdParam instanceof ManagerSaveRequest managerSaveRequest && secondParam instanceof Long) {
-                todoId = (Long) secondParam;
-                managerUserId = managerSaveRequest.getManagerUserId();
-            }
+            requestUserId = authUser.getId();
+            todoId = todoIdParam;
+            managerUserId = managerSaveRequest.getManagerUserId();
         }
 
         try {
