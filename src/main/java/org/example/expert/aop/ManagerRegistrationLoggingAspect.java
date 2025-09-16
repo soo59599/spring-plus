@@ -54,8 +54,15 @@ public class ManagerRegistrationLoggingAspect {
             log.info(LogResult.SUCCESS.getMessage());
             return result;
         } catch (Exception e) {
-            logService.saveLog(requestUserId, managerUserId, todoId, LogResult.FAIL);
-            log.info(LogResult.FAIL.getMessage());
+            try {
+                logService.saveLog(requestUserId, managerUserId, todoId, LogResult.FAIL);
+                log.info(LogResult.FAIL.getMessage());
+            } catch (Exception logException) {
+                // 로그 저장 실패
+                log.error("로그 저장 실패: {}", logException.getMessage());
+            }
+
+            // 원본 예외는 그대로 던짐
             throw e;
         }
     }
