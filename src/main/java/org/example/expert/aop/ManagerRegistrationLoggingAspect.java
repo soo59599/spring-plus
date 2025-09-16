@@ -51,9 +51,11 @@ public class ManagerRegistrationLoggingAspect {
         try {
             Object result = joinPoint.proceed();
             logService.saveLog(requestUserId, managerUserId, todoId, LogResult.SUCCESS);
+            log.info(LogResult.SUCCESS.getMessage());
             return result;
         } catch (Exception e) {
             logService.saveLog(requestUserId, managerUserId, todoId, LogResult.FAIL);
+            log.info(LogResult.FAIL.getMessage());
             throw e;
         }
     }
