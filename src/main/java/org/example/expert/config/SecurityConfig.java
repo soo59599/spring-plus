@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
+    private final JwtAuthenticationFilter JwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
@@ -34,21 +34,28 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(JwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // JWT 사용 시 불필요한 기능들 비활성화
+                .formLogin(AbstractHttpConfigurer::disable)      // [SSR] 서버가 로그인 HTML 폼 렌더링
+                .anonymous(AbstractHttpConfigurer::disable)      // 미인증 사용자를 익명으로 처리
+                .httpBasic(AbstractHttpConfigurer::disable)      // [SSR] 인증 팝업
+                .logout(AbstractHttpConfigurer::disable)         // [SSR] 서버가 세션 무효화 후 리다이렉트
+                .rememberMe(AbstractHttpConfigurer::disable)     // 서버가 쿠키 발급하여 자동 로그인
+
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers("/h2-console").permitAll()
+                                .requestMatchers("/h2-console/**").permitAll() // h2 DB용
                                 .anyRequest().authenticated())
 
                 .exceptionHandling(exceptionHandling ->exceptionHandling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler))
 
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin()));
+                        .frameOptions(frame -> frame.sameOrigin())); // h2 DB용
 
         return http.build();
     }

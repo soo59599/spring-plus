@@ -1,13 +1,10 @@
 package org.example.expert.security;
 
-import ch.qos.logback.core.spi.ErrorCodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
-import jdk.jshell.Snippet.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +21,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     // 403 권한 없음
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                       AccessDeniedException accessDeniedException) throws IOException {
 
         HttpStatus status = HttpStatus.FORBIDDEN;
         response.setStatus(status.value());
