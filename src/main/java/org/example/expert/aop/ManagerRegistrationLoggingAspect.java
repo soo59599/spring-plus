@@ -24,7 +24,6 @@ public class ManagerRegistrationLoggingAspect {
     public Object logManagerRegistration(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
 
-
         Long requestUserId = null;
         Long todoId = null;
         Long managerUserId = null;
@@ -39,23 +38,31 @@ public class ManagerRegistrationLoggingAspect {
             managerUserId = managerSaveRequest.getManagerUserId();
         }
 
-        try {
-            Object result = joinPoint.proceed();
-            logService.saveLog(requestUserId, managerUserId, todoId, LogResult.SUCCESS);
-            log.info(LogResult.SUCCESS.getMessage());
-            return result;
-        } catch (Exception e) {
-            try {
-                logService.saveLog(requestUserId, managerUserId, todoId, LogResult.FAIL);
-                log.info(LogResult.FAIL.getMessage());
-            } catch (Exception logException) {
-                // 로그 저장 실패
-                log.error("로그 저장 실패: {}", logException.getMessage());
-            }
+        Object result = null;
 
-            // 원본 예외는 그대로 던짐
-            throw e;
+        try {
+            result = joinPoint.proceed();
+        } catch (Exception e) {
+            failRegistration(e, requestUserId, managerUserId, todoId);
         }
+
+        logService.saveLog(requestUserId, managerUserId, todoId, LogResult.SUCCESS);
+        log.info(LogResult.SUCCESS.getMessage());
+        return result;
     }
+
+    private void failRegistration(Exception e, Long requestUserId, Long managerUserId, Long todoId) throws Exception {
+        try {
+            logService.saveLog(requestUserId, managerUserId, todoId, LogResult.FAIL);
+            log.info("{}: {}", LogResult.FAIL.getMessage(), e.getMessage());
+        } catch (Exception logException) {
+            // 로그 저장 실패
+            log.error("로그 저장 실패: {}", logException.getMessage());
+        }
+
+        // 원본 예외는 그대로 던짐
+        throw e;
+    }
+
 
 }
