@@ -47,16 +47,11 @@ public class SecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/h2-console/**").permitAll() // h2 DB용
                                 .anyRequest().authenticated())
 
                 .exceptionHandling(exceptionHandling ->exceptionHandling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                        .accessDeniedHandler(jwtAccessDeniedHandler))
-
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin())); // h2 DB용
-
+                        .accessDeniedHandler(jwtAccessDeniedHandler));
         return http.build();
     }
 }
