@@ -23,7 +23,6 @@ import org.example.expert.domain.todo.dto.TodoSearchCond;
 import org.example.expert.domain.todo.dto.response.TodoSearchResponse;
 import org.example.expert.domain.todo.entity.QTodo;
 import org.example.expert.domain.todo.entity.Todo;
-import org.example.expert.domain.user.entity.QUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -35,8 +34,6 @@ public class TodoRepositoryQueryImpl implements TodoRepositoryQuery {
 
     @Override
     public Optional<Todo> findByIdWithUser(Long todoId) {
-        QTodo todo = QTodo.todo;
-        QUser user = QUser.user;
         Todo todoOptional = jpaQueryFactory
                 .selectFrom(todo)
                 .leftJoin(todo.user, user).fetchJoin()
