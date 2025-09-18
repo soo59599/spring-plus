@@ -1,23 +1,32 @@
-spring:
-  application:
-    name: jdbc
-  # H2 Database 설정
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: 'jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE'   # H2 DB 연결 주소 (In-Memory Mode)
-    #url: 'jdbc:h2:~/test'    # H2 DB 연결 주소 (Embedded Mode)
-    username: sa        # H2 DB 접속 ID (사용자 지정)
-    password:        # H2 DB 접속 PW (사용자 지정)
-
-  # H2 Console 설정
-  h2:
-    console: # H2 DB를 웹에서 관리할 수 있는 기능
-      enabled: true           # H2 Console 사용 여부
-      path: /h2-console       # H2 Console 접속 주소
-
-jwt:
-  secret:
-    key: djfklsjfklsjfsklajfsklfjsdklfjsklfjasklfjskldjfs
-
 server:
   port: 8080
+
+spring:
+  # 기본적으로 local 프로필을 활성화합니다.
+  # JAR 실행 시 --spring.profiles.active=prod 와 같이 옵션을 주어 변경할 수 있습니다.
+  profiles:
+    active: local
+
+  jpa:
+    hibernate:
+      # [운영 환경 주의] 운영에서는 validate 또는 none 사용을 권장합니다.
+      # 스키마 변경은 Flyway, Liquibase 같은 마이그레이션 툴로 관리하는 것이 안전합니다.
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true # SQL 로그를 예쁘게 포맷팅
+    defer-datasource-initialization: true # data.sql 실행 시점 제어
+    open-in-view: false
+
+
+logging:
+  level:
+    org.hibernate.SQL: debug # 실행되는 SQL 쿼리 로그 보기
+    org.hibernate.type.descriptor.sql: trace   # SQL 쿼리의 '?'에 바인딩되는 파라미터 값을 로그로 확인하여 디버깅을 용이하게 합니다.
+
+# JWT 관련 공통 설정 (만료 시간 등)
+jwt:
+  # 시크릿 키는 절대로 여기에 직접 작성하지 않습니다.
+  # 각 환경별 yml 파일 또는 환경 변수에서 주입받습니다.
+  secret:
+    key: ${JWT_SECRET_KEY}

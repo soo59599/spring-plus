@@ -5,6 +5,7 @@ import static org.example.expert.domain.manager.entity.QManager.manager;
 import static org.example.expert.domain.todo.entity.QTodo.todo;
 import static org.example.expert.domain.user.entity.QUser.user;
 
+import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -22,7 +23,6 @@ import org.example.expert.domain.todo.dto.TodoSearchCond;
 import org.example.expert.domain.todo.dto.response.TodoSearchResponse;
 import org.example.expert.domain.todo.entity.QTodo;
 import org.example.expert.domain.todo.entity.Todo;
-import org.example.expert.domain.user.entity.QUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -34,8 +34,6 @@ public class TodoRepositoryQueryImpl implements TodoRepositoryQuery {
 
     @Override
     public Optional<Todo> findByIdWithUser(Long todoId) {
-        QTodo todo = QTodo.todo;
-        QUser user = QUser.user;
         Todo todoOptional = jpaQueryFactory
                 .selectFrom(todo)
                 .leftJoin(todo.user, user).fetchJoin()
@@ -48,10 +46,10 @@ public class TodoRepositoryQueryImpl implements TodoRepositoryQuery {
     @Override
     public Page<TodoSearchResponse> searchTodos(Pageable pageable, TodoSearchCond cond) {
         // 매니저 수
-        JPQLQuery<Long> managerCount = countManager();
+        JPQLQuery<Long> managerCount = createCountSubquery(manager, manager.todo);
 
         //Comment 수
-        JPQLQuery<Long> commentCount = countComment();
+        JPQLQuery<Long> commentCount = createCountSubquery(comment, comment.todo);
 
         List<TodoSearchResponse> todos = applyPageable(
                 createQuery(Projections.constructor(
@@ -68,7 +66,8 @@ public class TodoRepositoryQueryImpl implements TodoRepositoryQuery {
         return PageableExecutionUtils.getPage(todos, pageable, () -> totalCount != null ? totalCount : 0L);
     }
 
-    private <T> JPAQuery<T> baseQuery(Expression<T> expr, TodoSearchCond cond) {
+    // 쿼리용
+    private <T> JPAQuery<T> createQuery(Expression<T> expr, TodoSearchCond cond) {
         return jpaQueryFactory
                 .select(expr)
                 .from(todo)
@@ -80,23 +79,17 @@ public class TodoRepositoryQueryImpl implements TodoRepositoryQuery {
                 );
     }
 
-    // 리스트 조회용
-    private <T> JPAQuery<T> createQuery(Expression<T> expr, TodoSearchCond cond) {
-        return baseQuery(expr, cond);
-    }
-
     // count용
     private JPQLQuery<Long> countQuery(TodoSearchCond cond) {
-        return baseQuery(Wildcard.count, cond);
+        return createQuery(Wildcard.count, cond);
     }
 
     // Projections의 필드를 위한 갯수 세는 용도
-    private JPQLQuery<Long> countManager() {
-        return JPAExpressions.select(manager.count()).from(manager).where(manager.todo.eq(todo));
-    }
-
-    private JPQLQuery<Long> countComment() {
-        return JPAExpressions.select(comment.count()).from(comment).where(comment.todo.eq(todo));
+    private JPQLQuery<Long> createCountSubquery(EntityPath<?> entityPath, QTodo foreignKeyToTodo) {
+        return JPAExpressions
+                .select(Wildcard.count)
+                .from(entityPath)
+                .where(foreignKeyToTodo.eq(todo));
     }
 
     //페이징
@@ -121,6 +114,14 @@ public class TodoRepositoryQueryImpl implements TodoRepositoryQuery {
     }
 
     private BooleanExpression nicknameContains(String nickname) {
-        return nickname != null ? todo.user.nickname.contains(nickname) : null;
+        return nickname != null ?
+                JPAExpressions
+                        .selectOne()
+                        .from(manager)
+                        .where(
+                                manager.todo.eq(todo)
+                                        .and(manager.user.nickname.contains(nickname))
+                        )
+                        .exists() : null;
     }
 }
