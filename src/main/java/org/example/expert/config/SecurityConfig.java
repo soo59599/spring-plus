@@ -47,8 +47,7 @@ public class SecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/actuator/**").permitAll() //헬스체크용
-                                .requestMatchers("/error").permitAll()
+                                .requestMatchers("/health").permitAll() //헬스체크용
                                 .anyRequest().authenticated())
 
                 .exceptionHandling(exceptionHandling ->exceptionHandling
