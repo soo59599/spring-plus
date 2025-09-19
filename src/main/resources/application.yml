@@ -18,6 +18,11 @@ spring:
     defer-datasource-initialization: true # data.sql 실행 시점 제어
     open-in-view: false
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 
 logging:
   level:
