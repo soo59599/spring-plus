@@ -47,6 +47,7 @@ dependencies {
 
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // 헬스체크
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
