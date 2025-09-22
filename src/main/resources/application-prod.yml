@@ -1,0 +1,26 @@
+# 운영(Production) 환경 설정 - AWS
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # AWS RDS 엔드포인트 또는 DB 서버 주소를 환경 변수에서 주입
+    url: ${DB_URL}
+    # DB 사용자 이름을 환경 변수에서 주입
+    username: ${DB_USERNAME}
+    # DB 비밀번호를 환경 변수에서 주입
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      # 운영 환경에서는 절대 create, create-drop, update를 사용하면 안됩니다.
+      # validate: 엔티티와 테이블이 일치하는지만 검사
+      # none: 아무 작업도 하지 않음 (가장 안전)
+      ddl-auto: validate
+
+# 운영용 JWT 시크릿 키
+# AWS 환경 변수(Parameter Store, Secrets Manager 등)에서 강력하고 긴 시크릿 키를 주입받습니다.
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+logging:
+  level:
+    org.hibernate.SQL: info # 운영 환경에서는 SQL 로그를 debug 대신 info로 변경하여 로그 양을 줄입니다.

@@ -39,12 +39,6 @@ out/
 ### properties ###
 *.properties
 
-### application-{profile}.yml 파일 무시 ###
-**/application-*.yml
-
-### 템플릿 파일은 무시하지 않음 ###
-!src/main/resources/application-local.yml.template
-
 ### gradle-wrapper.properties 관련 파일은 무시하지 않음 ###
 !gradle-wrapper.properties
 !gradlew
