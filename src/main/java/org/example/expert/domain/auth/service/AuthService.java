@@ -24,7 +24,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-
     @Transactional
     public SignupResponse signup(SignupRequest signupRequest) {
 
@@ -40,7 +39,8 @@ public class AuthService {
                 signupRequest.getEmail(),
                 encodedPassword,
                 userRole,
-                signupRequest.getNickname()
+                signupRequest.getNickname(),
+                signupRequest.getProfileImageUrl()
         );
         User savedUser = userRepository.save(newUser);
 

@@ -19,4 +19,5 @@ public class SignupRequest {
     private String userRole;
     @NotBlank
     private String nickname;
+    private String profileImageUrl;
 }

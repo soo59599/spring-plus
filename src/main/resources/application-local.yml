@@ -1,0 +1,18 @@
+# 로컬 개발 환경 설정
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 로컬에 설치된 MySQL DB 주소
+    url: jdbc:mysql://localhost:3306/expert_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    # 로컬 DB 사용자 이름
+    username: root
+    # 로컬 DB 비밀번호
+    password: "0000"
+
+
+
+# JWT 시크릿 키 (로컬용이므로 간단하게 설정, 실제 운영에서는 훨씬 복잡해야 함)
+# 외부 유출 방지를 위해 이 파일은 .gitignore에 반드시 추가해야 합니다.
+jwt:
+  secret:
+    key: "a9uZ2dpbGx0vbmcuZXhwZXJ0LmxvY2FsLWRldi1zZWNyZXQta2V5LWZvci1qd3QtYXV0aGVudGljYXRpb24K"

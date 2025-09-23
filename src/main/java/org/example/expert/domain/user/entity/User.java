@@ -21,12 +21,15 @@ public class User extends Timestamped {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private String nickname;
+    @Column(nullable = true) // 프로필 이미지는 선택사항
+    private String profileImageUrl;
 
-    public User(String email, String password, UserRole userRole, String nickname) {
+    public User(String email, String password, UserRole userRole, String nickname, String profileImageUrl) {
         this.email = email;
         this.password = password;
         this.userRole = userRole;
         this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
     }
 
     private User(Long id, String email, UserRole userRole, String nickname) {
@@ -46,5 +49,9 @@ public class User extends Timestamped {
 
     public void updateRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }
