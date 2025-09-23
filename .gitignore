@@ -43,3 +43,7 @@ out/
 !gradle-wrapper.properties
 !gradlew
 !gradlew.bat
+
+### env 파일 ###
+.env
+*.env

@@ -1,6 +1,5 @@
 package org.example.expert.domain.auth.service;
 
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.config.JwtUtil;
 import org.example.expert.domain.auth.dto.request.SigninRequest;
@@ -12,11 +11,9 @@ import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.enums.UserRole;
 import org.example.expert.domain.user.repository.UserRepository;
-import org.example.expert.domain.user.service.S3Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +23,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final S3Service s3Service;
-
 
     @Transactional
-    public SignupResponse signup(SignupRequest signupRequest, MultipartFile profileImage) throws IOException{
+    public SignupResponse signup(SignupRequest signupRequest) {
 
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             throw new InvalidRequestException("이미 존재하는 이메일입니다.");
@@ -40,18 +35,12 @@ public class AuthService {
 
         UserRole userRole = UserRole.of(signupRequest.getUserRole());
 
-        String profileImageUrl = null;
-        // 프로필 이미지가 존재하고 비어있지 않은 경우에만 S3에 업로드
-        if (profileImage != null && !profileImage.isEmpty()) {
-            profileImageUrl = s3Service.uploadFile(profileImage);
-        }
-
         User newUser = new User(
                 signupRequest.getEmail(),
                 encodedPassword,
                 userRole,
                 signupRequest.getNickname(),
-                profileImageUrl
+                signupRequest.getProfileImageUrl()
         );
         User savedUser = userRepository.save(newUser);
 

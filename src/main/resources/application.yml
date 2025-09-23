@@ -18,13 +18,6 @@ spring:
     defer-datasource-initialization: true # data.sql 실행 시점 제어
     open-in-view: false
 
-  servlet:
-    multipart:
-      enabled: true               # 파일 업로드 요청을 허용합니다. (필수)
-      max-file-size: 10MB         # 파일 하나의 최대 크기를 10MB로 제한합니다. (필수)
-      max-request-size: 11MB      # 요청 하나의 총 크기를 11MB로 제한합니다. (파일 + 다른 데이터)
-
-
 management:
   endpoints:
     web:
